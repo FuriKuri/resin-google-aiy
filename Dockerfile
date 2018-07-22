@@ -1,7 +1,7 @@
 # base-image for node on any machine using a template variable,
 # see more about dockerfile templates here:http://docs.resin.io/pages/deployment/docker-templates
 # Note the node:slim image doesn't have node-gyp
-FROM resin/rpi-raspbian-debian:stretch
+FROM resin/armv7hf-debian:stretch
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
   python3 \
@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
   python-dev \
   alsa-utils \
   python3-setuptools \
+  python3.5-dev \
   rsync \
+  gcc \
   git && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN cp `which uname` /bin/uname-orig && echo '#!/bin/bash\nif [[ $1 == "-m" ]]; then echo "armv7l"; else /bin/uname-orig $@; fi;' > `which uname`
@@ -32,6 +34,7 @@ RUN git clone https://github.com/google/aiyprojects-raspbian.git && mv aiyprojec
 COPY pip.conf /etc/pip.conf
 
 # Install Google Assistant library
+RUN pip3 install wheel
 RUN pip3 install -r requirements.txt && \
   pip3 install --upgrade google-assistant-library
 
